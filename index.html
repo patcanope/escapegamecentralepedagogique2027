@@ -201,6 +201,7 @@
             max-height: 320px;
             overflow-y: auto;
             text-align: left;
+            user-select: all;
         }
 
         /* Section PDF Téléchargements */
@@ -382,7 +383,7 @@
                 <a href="https://claude.ai" target="_blank" rel="noopener" class="ai-link">Claude</a>
             </div>
 
-            <details>
+            <details id="promptDetails">
                 <summary>Voir ou copier manuellement le texte du prompt</summary>
                 <pre id="promptSource"># RÔLE ET POSTURE
 Tu es un ingénieur pédagogique expert en ludopédagogie et en conception d'escape games éducatifs dans l'enseignement supérieur (notamment en IUT : approche par compétences, BUT, SAÉ, TD/TP).
@@ -610,20 +611,49 @@ Salue chaleureusement l'enseignant, présente très brièvement ta démarche en 
 </footer>
 
 <script>
-    function copyPrompt() {
-        const promptText = document.getElementById('promptSource').innerText;
+    function showCopiedFeedback() {
         const btn = document.getElementById('copyBtn');
-        
-        navigator.clipboard.writeText(promptText).then(() => {
-            btn.classList.add('copied');
-            btn.innerHTML = '<span>✅ Prompt copié ! Collez-le dans votre IA</span>';
-            setTimeout(() => {
-                btn.classList.remove('copied');
-                btn.innerHTML = '<span>📋 Copier le Prompt Maïeuticien</span>';
-            }, 3500);
-        }).catch(() => {
-            alert("La copie automatique a été bloquée par votre navigateur. Dépliez 'Voir ou copier manuellement' juste en dessous.");
-        });
+        btn.classList.add('copied');
+        btn.innerHTML = '<span>✅ Prompt copié ! Collez-le dans votre IA</span>';
+        setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.innerHTML = '<span>📋 Copier le Prompt Maïeuticien</span>';
+        }, 3500);
+    }
+
+    function fallbackCopyText(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                showCopiedFeedback();
+            } else {
+                document.getElementById('promptDetails').open = true;
+                alert("Sélectionnez le texte affiché ci-dessous et faites Ctrl+C.");
+            }
+        } catch (err) {
+            document.getElementById('promptDetails').open = true;
+        }
+        document.body.removeChild(textArea);
+    }
+
+    function copyPrompt() {
+        const promptText = document.getElementById('promptSource').textContent;
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(promptText).then(() => {
+                showCopiedFeedback();
+            }).catch(() => {
+                fallbackCopyText(promptText);
+            });
+        } else {
+            fallbackCopyText(promptText);
+        }
     }
 
     function openTab(evt, tabId) {
