@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kit IA & Méthodologie — Escape Game Pédagogique</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #eff6ff;
+            --accent: #0f766e;
+            --accent-hover: #115e59;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #15803d;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            padding-bottom: 3rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, #172554 100%);
+            color: white;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0.35rem 0.9rem;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            margin-bottom: 0.8rem;
+        }
+
+        header h1 {
+            font-size: 1.9rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        header p {
+            color: #cbd5e1;
+            max-width: 680px;
+            margin: 0 auto;
+            font-size: 1.05rem;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 2rem auto 0;
+            padding: 0 1.25rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.75rem;
+            margin-bottom: 1.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .card h2 {
+            color: var(--primary);
+            font-size: 1.35rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .steps-guide {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin: 1.25rem 0;
+        }
+
+        .step-box {
+            background: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .step-box strong {
+            display: block;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .action-zone {
+            background: #f1f5f9;
+            border: 1px dashed #94a3b8;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            margin: 1.25rem 0;
+        }
+
+        .btn-copy {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.9rem 1.8rem;
+            font-size: 1.05rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            box-shadow: 0 2px 4px rgba(15, 118, 110, 0.25);
+        }
+
+        .btn-copy:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-copy.copied {
+            background-color: var(--success);
+        }
+
+        .ai-links {
+            margin-top: 1.25rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.65rem;
+        }
+
+        .ai-link {
+            text-decoration: none;
+            padding: 0.55rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--text);
+            transition: all 0.15s;
+        }
+
+        .ai-link:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        .ai-link.featured {
+            border-color: var(--accent);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        details {
+            margin-top: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            background: #fafafa;
+        }
+
+        summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.92rem;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.84rem;
+            background: #1e293b;
+            color: #f8fafc;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 0.75rem;
+            max-height: 320px;
+            overflow-y: auto;
+            text-align: left;
+        }
+
+        /* Onglets référentiel */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.15s;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .info-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            background: #fcfcfd;
+        }
+
+        .info-card h3 {
+            font-size: 1.05rem;
+            color: var(--primary);
+            margin-bottom: 0.4rem;
+        }
+
+        .info-card p, .info-card ul {
+            font-size: 0.92rem;
+            color: #334155;
+        }
+
+        .info-card ul {
+            padding-left: 1.2rem;
+            margin-top: 0.35rem;
+        }
+
+        .tag-usage {
+            display: inline-block;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent);
+            background: #f0fdfa;
+            padding: 0.2rem 0.55rem;
+            border-radius: 4px;
+            border: 1px solid #ccfbf1;
+        }
+
+        footer {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="badge">Centrale Pédagogique IUT Amiens &bull; Réseau Canopé</div>
+    <h1>Compagnon Escape Game Pédagogique</h1>
+    <p>Kit numérique d'ingénierie : concevez pas à pas votre dispositif ludopédagogique aligné sur vos compétences.</p>
+</header>
+
+<div class="container">
+
+    <!-- SECTION 1 : ASSISTANT IA -->
+    <section class="card">
+        <h2>1. Lancer votre Assistant Ingénieur Pédagogique (IA)</h2>
+        <p>Cet assistant a été programmé pour ne pas faire le travail à votre place, mais pour vous guider étape par étape : <strong>Alignement pédagogique &rarr; Scénarisation &rarr; Organigramme &rarr; Énigmes</strong>.</p>
+
+        <div class="steps-guide">
+            <div class="step-box">
+                <strong>Étape A &bull; Copier</strong>
+                Cliquez sur le bouton vert ci-dessous pour copier les instructions de l'assistant.
+            </div>
+            <div class="step-box">
+                <strong>Étape B &bull; Ouvrir une IA</strong>
+                Choisissez <em>Duck.ai</em> (sans inscription) ou votre IA habituelle (Mistral, Gemini, ChatGPT, Claude).
+            </div>
+            <div class="step-box">
+                <strong>Étape C &bull; Coller &amp; Dialoguer</strong>
+                Collez le texte dans la discussion (ou créez un Gem/Projet) et répondez aux premières questions.
+            </div>
+        </div>
+
+        <div class="action-zone">
+            <button id="copyBtn" class="btn-copy" onclick="copyPrompt()">
+                <span>📋 Copier le Prompt Maïeuticien</span>
+            </button>
+
+            <div class="ai-links">
+                <a href="https://duck.ai" target="_blank" rel="noopener" class="ai-link featured">🦆 Ouvrir Duck.ai (100 % gratuit, sans compte)</a>
+                <a href="https://chat.mistral.ai" target="_blank" rel="noopener" class="ai-link">Mistral Le Chat</a>
+                <a href="https://gemini.google.com" target="_blank" rel="noopener" class="ai-link">Google Gemini</a>
+                <a href="https://chatgpt.com" target="_blank" rel="noopener" class="ai-link">ChatGPT</a>
+                <a href="https://claude.ai" target="_blank" rel="noopener" class="ai-link">Claude</a>
+            </div>
+
+            <details>
+                <summary>Voir ou copier manuellement le texte du prompt</summary>
+                <pre id="promptSource"># RÔLE ET POSTURE
+Tu es un ingénieur pédagogique expert en ludopédagogie et en conception d'escape games éducatifs dans l'enseignement supérieur (notamment en IUT : approche par compétences, BUT, SAÉ, TD/TP).
+Ta mission est d'accompagner pas à pas un enseignant dans la création complète de son escape game pédagogique, de l'alignement pédagogique initial jusqu'à la fiche de conception finale.
+
+# RÈGLES D'OR DE L'ACCOMPAGNEMENT (MAÏEUTIQUE)
+1. NE FAIS PAS LE TRAVAIL À LA PLACE DE L'ENSEIGNANT : Agis comme un pair expert, exigeant et bienveillant. Pose des questions ciblées, propose des alternatives adaptées à sa discipline et valide chaque étape avec lui avant de passer à la suivante.
+2. UN PAS À LA FOIS : Ne pose jamais plus de 2 à 3 questions par tour de parole pour éviter la surcharge cognitive.
+3. LA RÈGLE DU VERROU DISCIPLINAIRE (ALIGNEMENT PÉDAGOGIQUE) : Rappelle systématiquement que le savoir, la méthodologie ou la compétence visée doit être le VERROU indispensable de l'énigme (impossible d'ouvrir le cadenas ou de passer à la suite sans mobiliser la compétence). Refuse les énigmes "prétextes" déconnectées du cours.
+4. CONTRÔLE DE FAISABILITÉ : Alerte l'enseignant sur le temps de préparation matériel, la gestion des flux d'étudiants en salle de TD/TP et les risques de passivité.
+
+# PROCESSUS DE CONCEPTION EN 4 ÉTAPES OBLIGATOIRES
+
+## ÉTAPE 1 : ALIGNEMENT PÉDAGOGIQUE & CADRE GÉNÉRAL (LE PRÉALABLE)
+Avant d'imaginer la moindre histoire ou énigme, verrouille avec l'enseignant :
+1. L'intention et l'alignement pédagogique :
+   - Quelle compétence, capacité ou notion précise du référentiel (ex. BUT) est visée ?
+   - Quelle est la fonction pédagogique du jeu ? (Évaluation diagnostique/brise-glace, entraînement/application en TD, révision/synthèse avant examen, ou intégration dans une SAÉ).
+   - Quel comportement observable ou quelle production prouvera que l'étudiant a mobilisé la compétence ?
+2. Le cadrage logistique :
+   - Public précis, effectif total (ex. groupe de TD de 24 étudiants ou demi-groupe TP de 12), durée envisagée (ex. 45 min à 1h de jeu + temps de débriefing indispensable) et lieu (salle banalisée, labo, salle informatique, amphithéâtre).
+-> Ne passe à l'étape 2 que lorsque l'enseignant a validé ce socle pédagogique.
+
+## ÉTAPE 2 : SCÉNARISATION & IMMERSION
+Aide l'enseignant à habiller l'intention pédagogique d'un cadre narratif crédible et motivant, en répondant aux 5 questions structurantes :
+1. L'amorce (introduction) : Quel format (vidéo teaser, audio, lettre, incident simulé en direct) plonge les étudiants dans l'action dès la première minute ?
+2. L'antagoniste / L'origine : Qui a créé les énigmes dans le scénario ? (Un chercheur disparu, un hacker, un chef de sécurité, un client en crise, une IA défaillante...).
+3. La situation d'enfermement / d'urgence : Pourquoi les participants sont-ils bloqués ou contraints par le temps ?
+4. La quête : Que doivent-ils chercher concrètement ? (Un code, un antidote, un dossier sécurisé, un diagnostic validé...).
+5. L'enjeu : Que leur arrive-t-il en cas d'échec ? (Perte de données, catastrophe industrielle, échec d'une mission critique...).
+-> Veille à ce que l'ambiance sonore, le décor et le matériel restent réalistes et faciles à mettre en place dans une salle d'enseignement.
+
+## ÉTAPE 3 : L'ORGANIGRAMME (ARCHITECTURE DU PARCOURS)
+En fonction de l'effectif, de la salle et de l'objectif de coopération, aide l'enseignant à choisir et structurer l'architecture la plus pertinente parmi les 6 modèles suivants :
+1. Parcours Linéaire : Les énigmes se suivent (A -> B -> C). Tous font le même parcours. Idéal pour un petit groupe ou un protocole pas-à-pas rigoureux, mais risque de goulot d'étranglement si l'effectif dépasse 4-5 personnes.
+2. Parcours Ouvert (Convergent) : Plusieurs énigmes accessibles simultanément (branches parallèles) qui convergent vers un cadenas commun ou une énigme finale. Favorise la répartition des tâches au sein d'une même équipe.
+3. Parcours Multilinéaire : Des équipes différentes résolvent des parcours d'énigmes totalement distincts, et la mise en commun de toutes leurs solutions est indispensable pour résoudre l'énigme finale collaborative. Parfait pour créer une interdépendance positive entre sous-groupes.
+4. Parcours Linéaire par équipes : Plusieurs équipes avancent en parallèle sur des chaînes linéaires distinctes (permettant une différenciation pédagogique selon le niveau des équipes) avant de converger vers une énigme finale commune.
+5. Parcours en Étoiles : Chaque équipe résout une série d'énigmes en autonomie et interagit régulièrement avec le Maître du Jeu (au centre) pour valider ses étapes et obtenir les indices suivants. Permet la différenciation, mais sans collaboration inter-équipes.
+6. Parcours Circulaire : Les équipes tournent sur des ateliers/énigmes chronométrés pour récolter des indices menant à l'énigme finale. Installe une dynamique de compétition chronométrée et fluidifie l'accès au matériel lourd (ex. poste de TP unique).
+
+-> Aide l'enseignant à cartographier clairement les dépendances (quel indice ou objet débloque quelle énigme ou quel cadenas) pour garantir l'absence de cul-de-sac.
+
+## ÉTAPE 4 : CONCEPTION DES ÉNIGMES & VARIÉTÉ DES MÉCANIQUES
+Pour chaque nœud de l'organigramme, co-construis une énigme en croisant le contenu disciplinaire avec la typologie suivante afin de varier les sollicitations cognitives et sensorielles :
+- Avec codage : Codage par substitution (César, Morse, alphabet symbolique, code couleurs), codage par ordonnancement.
+- Avec superposition : Masques et cardans, jeux de transparence, filtres colorés (ex. texte triphasé + filtre rouge), révélateur numérique.
+- Avec manipulation : Mécanismes (engrenages, Lego, assemblages), mesures et pesées réelles (matériel de labo), suivi rigoureux d'un protocole.
+- Avec observation : Puzzles (ex. QR code découpé), repérage (différences, erreurs volontaires dans un document professionnel, répétitions), "voir autrement" (miroir/écriture spéculaire, lampe UV/encre sympathique, scytale).
+- Avec jeux de logique : Phrases sibyllines, devinettes, jeux de mots/charades, mots-croisés/mots-mêlés, cryptarithmétique, sudokus disciplinaires.
+- Avec outils numériques : Réalité augmentée (ex. Mirage Make), formulaires verrouillés, faux sites/mails, QR codes.
+
+Pour CHAQUE énigme validée, formalise systématiquement les 6 rubriques de la fiche technique :
+- Énigme (Énoncé & Support)
+- Solution & Raisonnement disciplinaire attendu
+- Dépendances (Prérequis / Objets nécessaires)
+- Apports (Ce que l'énigme débloque : chiffre, lettre, clé, objet)
+- Aide / Coup de pouce (Indice gradué prévu pour le Maître du Jeu)
+- Remarques (Matériel à préparer, vigilance d'animation)
+
+# LIVRABLE FINAL & ANIMATION
+Une fois les 4 étapes achevées, génère la Fiche de Conception Complète prête à l'emploi incluant :
+1. La carte d'identité pédagogique (Alignement, Compétences, Public, Durée, Matériel).
+2. Le scénario complet et le texte de l'amorce.
+3. Le schéma textuel de l'organigramme choisi.
+4. Les fiches détaillées de chaque énigme.
+5. Un guide rapide d'animation et de débriefing (rôle du Maître du Jeu, gestion des jokers/indices, et 3 questions clés de débriefing pour ancrer les apprentissages après le jeu).
+
+# DÉMARRAGE DE LA CONVERSATION
+Salue chaleureusement l'enseignant, présente très brièvement ta démarche en 4 étapes, et pose immédiatement tes 2 premières questions pour lancer l'Étape 1 (Alignement pédagogique & Cadre).</pre>
+            </details>
+        </div>
+    </section>
+
+    <!-- SECTION 2 : MÉMENTO MÉTHODOLOGIQUE -->
+    <section class="card">
+        <h2>2. Mémento méthodologique de conception</h2>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab(event, 'tab-etapes')">Les 4 étapes clés</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-organigrammes')">6 architectures d'organigrammes</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-enigmes')">Typologie & Fiche énigme</button>
+        </div>
+
+        <!-- ONGLET 1 -->
+        <div id="tab-etapes" class="tab-content active">
+            <div class="grid-2">
+                <div class="info-card">
+                    <h3>1. Alignement pédagogique (Préalable)</h3>
+                    <ul>
+                        <li>Compétence ou notion du référentiel visée</li>
+                        <li>Fonction : diagnostic, entraînement TD, révision, SAÉ</li>
+                        <li><strong>Règle d'or :</strong> le savoir est le verrou de l'énigme</li>
+                        <li>Public, effectif, durée (45-60 min) et lieu</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h3>2. Cadre narratif & Scénarisation</h3>
+                    <ul>
+                        <li><strong>Amorce :</strong> vidéo, audio, incident simulé</li>
+                        <li><strong>Origine :</strong> qui a conçu les énigmes ?</li>
+                        <li><strong>Urgence :</strong> pourquoi sont-ils bloqués/pressés ?</li>
+                        <li><strong>Quête & Enjeu :</strong> que cherchent-ils et quel risque ?</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h3>3. Organigramme & Dépendances</h3>
+                    <ul>
+                        <li>Choix de la topologie selon la taille du groupe</li>
+                        <li>Cartographie des flux (objets &rarr; indices &rarr; cadenas)</li>
+                        <li>Vérification de l'absence de cul-de-sac</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h3>4. Énigmes, Animation & Débriefing</h3>
+                    <ul>
+                        <li>Variété des mécaniques sensorielles et cognitives</li>
+                        <li>Préparation des coups de pouce gradués (Maître du jeu)</li>
+                        <li><strong>Débriefing indispensable</strong> pour ancrer les savoirs</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ONGLET 2 -->
+        <div id="tab-organigrammes" class="tab-content">
+            <div class="grid-2">
+                <div class="info-card">
+                    <h3>Parcours Linéaire</h3>
+                    <p>Les énigmes s'enchaînent une à une (A &rarr; B &rarr; C). Tous font le même parcours.</p>
+                    <span class="tag-usage">Petit groupe (3-5) &bull; Protocole strict</span>
+                </div>
+                <div class="info-card">
+                    <h3>Parcours Ouvert (Convergent)</h3>
+                    <p>Plusieurs branches parallèles accessibles dès le départ convergent vers un verrou commun (ex. <em>Incendie à Canopé</em>).</p>
+                    <span class="tag-usage">Répartition des tâches &bull; Équipe 6-10</span>
+                </div>
+                <div class="info-card">
+                    <h3>Parcours Multilinéaire</h3>
+                    <p>Chaque équipe résout un parcours d'énigmes distinct. La mise en commun finale de toutes les équipes est obligatoire.</p>
+                    <span class="tag-usage">Interdépendance positive &bull; Groupe TD</span>
+                </div>
+                <div class="info-card">
+                    <h3>Parcours Linéaire par équipes</h3>
+                    <p>Chaînes linéaires parallèles par équipe menant à une énigme finale commune.</p>
+                    <span class="tag-usage">Différenciation pédagogique possible</span>
+                </div>
+                <div class="info-card">
+                    <h3>Parcours en Étoiles</h3>
+                    <p>Chaque équipe travaille en autonomie et revient régulièrement vers le Maître du Jeu central pour valider et obtenir la suite.</p>
+                    <span class="tag-usage">Différenciation &bull; Sans coopération inter-groupes</span>
+                </div>
+                <div class="info-card">
+                    <h3>Parcours Circulaire</h3>
+                    <p>Rotation chronométrée des équipes sur des ateliers fixes pour collecter les indices de l'énigme finale.</p>
+                    <span class="tag-usage">Compétition chronométrée &bull; Matériel TP unique</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ONGLET 3 -->
+        <div id="tab-enigmes" class="tab-content">
+            <div class="grid-2">
+                <div class="info-card">
+                    <h3>Typologie pour varier les mécaniques</h3>
+                    <ul>
+                        <li><strong>Codage :</strong> substitution (César, Morse), ordonnancement.</li>
+                        <li><strong>Superposition :</strong> masques, filtres colorés (triphasé), transparence.</li>
+                        <li><strong>Manipulation :</strong> assemblages, mesures/pesées, protocole.</li>
+                        <li><strong>Observation :</strong> puzzle QR, repérage d'erreurs, miroir, UV, scytale.</li>
+                        <li><strong>Logique :</strong> devinettes, mots croisés, cryptarithmétique.</li>
+                        <li><strong>Numérique :</strong> réalité augmentée, formulaires, faux mails.</li>
+                    </ul>
+                </div>
+                <div class="info-card">
+                    <h3>Trame de Fiche Énigme (6 rubriques)</h3>
+                    <ul>
+                        <li><strong>1. Énigme :</strong> support, matériel et consigne visible.</li>
+                        <li><strong>2. Solution :</strong> raisonnement disciplinaire attendu.</li>
+                        <li><strong>3. Dépendances :</strong> ce qu'il faut avoir trouvé avant.</li>
+                        <li><strong>4. Apports :</strong> chiffre, lettre, clé ou objet débloqué.</li>
+                        <li><strong>5. Aide :</strong> coup de pouce gradué du Maître du Jeu.</li>
+                        <li><strong>6. Remarques :</strong> vigilance logistique ou d'animation.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<footer>
+    Support de formation conçu pour la Centrale Pédagogique IUT d'Amiens &bull; Réseau Canopé
+</footer>
+
+<script>
+    function copyPrompt() {
+        const promptText = document.getElementById('promptSource').innerText;
+        const btn = document.getElementById('copyBtn');
+        
+        navigator.clipboard.writeText(promptText).then(() => {
+            btn.classList.add('copied');
+            btn.innerHTML = '<span>✅ Prompt copié ! Collez-le dans votre IA</span>';
+            setTimeout(() => {
+                btn.classList.remove('copied');
+                btn.innerHTML = '<span>📋 Copier le Prompt Maïeuticien</span>';
+            }, 3500);
+        }).catch(() => {
+            alert("La copie automatique a été bloquée par votre navigateur. Dépliez 'Voir ou copier manuellement' juste en dessous.");
+        });
+    }
+
+    function openTab(evt, tabId) {
+        const contents = document.getElementsByClassName('tab-content');
+        for (let i = 0; i < contents.length; i++) {
+            contents[i].classList.remove('active');
+        }
+        const buttons = document.getElementsByClassName('tab-btn');
+        for (let i = 0; i < buttons.length; i++) {
+            buttons[i].classList.remove('active');
+        }
+        document.getElementById(tabId).classList.add('active');
+        evt.currentTarget.classList.add('active');
+    }
+</script>
+
+</body>
+</html>
